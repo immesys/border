@@ -1,0 +1,21 @@
+MYIF="eth0"
+
+HEUSER=tb4d9235a867bfa6.46687149
+HEPASS=b0fc738afe8f96b244ecbe5d325b92c7
+HETUNNEL=228600
+HETHEIR4END=72.52.104.74
+HEYOUR6END=2001:470:1f04:dd0::2/64
+HETHEIR6END=2001:470:1f04:dd0::1
+
+NEW_IP=`curl ifconfig.me`
+
+LOCAL_IP=$NEW_IP
+
+curl -k -s "https://ipv4.tunnelbroker.net/ipv4_end.php?ipv4b=$NEW_IP&pass=$HEPASS&user_id=$HEUSER&tunnel_id=$HETUNNEL"
+
+#ignore any errors:
+ip tunnel add he-ipv6 mode sit remote $HETHEIR4END local $LOCAL_IP ttl 255
+ip link set he-ipv6 up
+ip addr add $HEYOUR6END dev he-ipv6
+ip route add ::/0 dev he-ipv6
+ip -f inet6 addr
